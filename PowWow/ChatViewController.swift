@@ -1,12 +1,13 @@
 import UIKit
+import Firebase
 
 
-class ChatViewController: UIViewController {
+class ChatViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
     
     // Declare instance variables here
 
     
-    // We've pre-linked the IBOutlets
+    // IB outlets
     @IBOutlet var heightConstraint: NSLayoutConstraint!
     @IBOutlet var sendButton: UIButton!
     @IBOutlet var messageTextfield: UITextField!
@@ -18,6 +19,8 @@ class ChatViewController: UIViewController {
         super.viewDidLoad()
         
         //TODO: Set yourself as the delegate and datasource here:
+        messageTableView.delegate = self
+        messageTableView.dataSource = self
         
         
         
@@ -41,7 +44,10 @@ class ChatViewController: UIViewController {
     
     
     //TODO: Declare cellForRowAtIndexPath here:
-    
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        
+        let cell = tableView.dequeueReusableCell(withIdentifier: "customMessageCell", for: indexPath) as! CustomMessageCell
+    }
     
     
     //TODO: Declare numberOfRowsInSection here:
@@ -98,9 +104,15 @@ class ChatViewController: UIViewController {
     
     @IBAction func logOutPressed(_ sender: AnyObject) {
         
-        //TODO: Log out the user and send them back to WelcomeViewController
-        
-        
+        //logging out the user and sending them back to the homepage
+        do {
+            try Auth.auth().signOut()
+            
+            navigationController?.popToRootViewController(animated: true)
+        }
+        catch {
+            print("there was an error signing out")
+        }
     }
     
 

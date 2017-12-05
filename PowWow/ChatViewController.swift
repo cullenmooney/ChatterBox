@@ -4,7 +4,7 @@ import Firebase
 
 class ChatViewController: UIViewController, UITableViewDelegate, UITableViewDataSource , UITextFieldDelegate {
     
-    // Declare instance variables here
+    var messageArray : [Message] = [Message]()
 
     
     // IB outlets
@@ -42,6 +42,9 @@ class ChatViewController: UIViewController, UITableViewDelegate, UITableViewData
         // calling the custom message cell height function
         configureTableView()
         
+        // calling the function to get the messages from the db
+        retrieveMessages()
+        
     }
     
     //declaring cell for row at index
@@ -49,17 +52,20 @@ class ChatViewController: UIViewController, UITableViewDelegate, UITableViewData
         
         let cell = tableView.dequeueReusableCell(withIdentifier: "customMessageCell", for: indexPath) as! CustomMessageCell
         
-        let messageArray = ["First Message", "Second Message", "Third Message"]
-        
-        cell.messageBody.text = messageArray[indexPath.row]
+        // defining our messages, username, and avatar
+        cell.messageBody.text = messageArray[indexPath.row].messageBody
+        cell.senderUsername.text = messageArray[indexPath.row].sender
+        cell.avatarImageView.image = UIImage(named: "egg")
         
         return cell
     }
     
     
-    //TODO: Declare numberOfRowsInSection here:
+    // setting the number of cells in tableview
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return 3
+        
+        // number of cells should be equal to how many messages are in the message array
+        return messageArray.count
     }
     
     
@@ -133,10 +139,31 @@ class ChatViewController: UIViewController, UITableViewDelegate, UITableViewData
         
     }
     
-    //TODO: Create the retrieveMessages method here:
-    
-    
-
+    //retrieving the message and user email from the db
+    // changing the snapchot to a dictionary because that's how we sent to it to the db
+    func retrieveMessages() {
+        let messageDB = Database.database().reference().child("Messages")
+        
+        messageDB.observe(.childAdded, with: { (snapshot) in
+            let snapshotValue = snapshot.value as! Dictionary<String,String>
+            
+            let text = snapshotValue["MessageBody"]!
+            let sender = snapshotValue["Sender"]!
+            
+            let message = Message()
+                message.sender = sender
+                message.messageBody = text
+            
+            // appending the message object into the messageArray
+            self.messageArray.append(message)
+            
+            // reconfiguring the table view
+            self.configureTableView()
+            
+            // reloading the table view
+            self.messageTableView.reloadData()
+        })
+    }
     
     @IBAction func logOutPressed(_ sender: AnyObject) {
         

@@ -8,9 +8,11 @@ class LogInViewController: UIViewController {
     //Textfields pre-linked with IBOutlets
     @IBOutlet var emailTextfield: UITextField!
     @IBOutlet var passwordTextfield: UITextField!
+    @IBOutlet weak var incorrectLoginMessage: UILabel!
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        incorrectLoginMessage.isHidden = true
         
     }
 
@@ -28,13 +30,15 @@ class LogInViewController: UIViewController {
         Auth.auth().signIn(withEmail: emailTextfield.text!, password: passwordTextfield.text!) {(user, error) in
             if error != nil {
                 print(error!)
+                self.incorrectLoginMessage.isHidden = false
+                SVProgressHUD.dismiss()
             }
             else {
                 print("successful login")
                 
                 // dismiss loading icon after logging in
                 SVProgressHUD.dismiss()
-                
+                self.incorrectLoginMessage.isHidden = true
                 self.performSegue(withIdentifier: "goToChat", sender: self)
             }
         }

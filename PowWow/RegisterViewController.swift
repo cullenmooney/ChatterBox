@@ -7,10 +7,12 @@ class RegisterViewController: UIViewController {
 
     @IBOutlet var emailTextfield: UITextField!
     @IBOutlet var passwordTextfield: UITextField!
+    @IBOutlet weak var incorrectRegistrationMessage: UILabel!
     
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        incorrectRegistrationMessage.isHidden = true
     }
 
     override func didReceiveMemoryWarning() {
@@ -30,6 +32,8 @@ class RegisterViewController: UIViewController {
             (user, error) in
             if error != nil {
                 print(error!)
+                SVProgressHUD.dismiss()
+                self.incorrectRegistrationMessage.isHidden = false
             }
             else {
                 //success
@@ -37,7 +41,8 @@ class RegisterViewController: UIViewController {
                 
                 // Dismissing loading icon after registration
                 SVProgressHUD.dismiss()
-                
+                self.incorrectRegistrationMessage.isHidden = true
+                SVProgressHUD.dismiss()
                 self.performSegue(withIdentifier: "goToChat", sender: self)
             }
         }

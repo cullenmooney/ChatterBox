@@ -106,8 +106,8 @@ class ChatViewController: UIViewController, UITableViewDelegate, UITableViewData
         
         UIView.animate(withDuration: 0.5) {
             
-            //keyboard is 258 points height, so we add that to our height constraint of 50
-            self.heightConstraint.constant = 308
+            //keyboard is 258 points height, so we add that to our height constraint of 50 -- 308 before
+            self.heightConstraint.constant = 270
             
             //if a constraint or something in view has changed --> redraw it
             self.view.layoutIfNeeded()
@@ -207,8 +207,13 @@ class ChatViewController: UIViewController, UITableViewDelegate, UITableViewData
     
     // used when keyboard textfield is pressed and exited so that user sees most recent message
     func chatScrollUp() {
-        let indexPath = NSIndexPath(row: messageArray.count - 1, section: 0)
-        messageTableView.scrollToRow(at: indexPath as IndexPath, at: .top, animated: true)
+        if messageArray.count > 1 {
+            let indexPath = NSIndexPath(row: messageArray.count - 1, section: 0)
+            messageTableView.scrollToRow(at: indexPath as IndexPath, at: .top, animated: true)
+        }
+        else {
+            
+        }
     }
     
 }

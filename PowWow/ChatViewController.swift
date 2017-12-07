@@ -24,12 +24,10 @@ class ChatViewController: UIViewController, UITableViewDelegate, UITableViewData
         messageTableView.dataSource = self
         
         
-        
         //setting self as the textfield delegate
         messageTextfield.delegate = self
         
         
-    
         //tap gesture for when user taps out of the messagefield
         let tapGesture = UITapGestureRecognizer(target: self, action:
             #selector(tableViewTapped))
@@ -46,9 +44,9 @@ class ChatViewController: UIViewController, UITableViewDelegate, UITableViewData
         // calling the function to get the messages from the db
         retrieveMessages()
         
-        
+        // no lines between rows
         messageTableView.separatorStyle = .none
-        
+
     }
     
     //declaring cell for row at index
@@ -59,7 +57,7 @@ class ChatViewController: UIViewController, UITableViewDelegate, UITableViewData
         // defining our messages, username, and avatar
         cell.messageBody.text = messageArray[indexPath.row].messageBody
         cell.senderUsername.text = messageArray[indexPath.row].sender
-        cell.avatarImageView.image = UIImage(named: "egg")
+        cell.avatarImageView.image = UIImage(named: "avatar")
         
         if cell.senderUsername.text == Auth.auth().currentUser?.email as String! {
             // Messages we sent
@@ -72,14 +70,17 @@ class ChatViewController: UIViewController, UITableViewDelegate, UITableViewData
             cell.messageBackground.backgroundColor = UIColor.flatGray()
         }
         
+        
         return cell
+        
+        
     }
-    
     
     // setting the number of cells in tableview
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         
         // number of cells should be equal to how many messages are in the message array
+        
         return messageArray.count
     }
     
@@ -96,6 +97,7 @@ class ChatViewController: UIViewController, UITableViewDelegate, UITableViewData
     func configureTableView() {
         messageTableView.rowHeight = UITableViewAutomaticDimension
         messageTableView.estimatedRowHeight = 120.0
+        
     }
     
     //when chat textfield is pressed --> bring the keyboard up
@@ -103,14 +105,17 @@ class ChatViewController: UIViewController, UITableViewDelegate, UITableViewData
     func textFieldDidBeginEditing(_ textField: UITextField) {
         
         UIView.animate(withDuration: 0.5) {
-             //keyboard is 258 points height, so we add that to our height constraint of 50
+            
+            //keyboard is 258 points height, so we add that to our height constraint of 50
             self.heightConstraint.constant = 308
             
             //if a constraint or something in view has changed --> redraw it
             self.view.layoutIfNeeded()
         }
+        
+        chatScrollUp()
+        
     }
-    
     
     //when chat textfield is done editing --> bring the keyboard down
     
@@ -120,6 +125,8 @@ class ChatViewController: UIViewController, UITableViewDelegate, UITableViewData
             self.heightConstraint.constant = 50
             self.view.layoutIfNeeded()
         }
+        
+        chatScrollUp()
     }
     
     @IBAction func sendPressed(_ sender: AnyObject) {
@@ -149,6 +156,7 @@ class ChatViewController: UIViewController, UITableViewDelegate, UITableViewData
                 self.messageTextfield.isEnabled = true
                 self.sendButton.isEnabled = true
                 self.messageTextfield.text = ""
+                self.chatScrollUp()
             }
         }
         
@@ -177,7 +185,11 @@ class ChatViewController: UIViewController, UITableViewDelegate, UITableViewData
             
             // reloading the table view
             self.messageTableView.reloadData()
+            
+            // making the chats scroll to the bottom upon loading
+            self.chatScrollUp()
         })
+       
     }
     
     @IBAction func logOutPressed(_ sender: AnyObject) {
@@ -191,6 +203,12 @@ class ChatViewController: UIViewController, UITableViewDelegate, UITableViewData
         catch {
             print("there was an error signing out")
         }
+    }
+    
+    // used when keyboard textfield is pressed and exited so that user sees most recent message
+    func chatScrollUp() {
+        let indexPath = NSIndexPath(row: messageArray.count - 1, section: 0)
+        messageTableView.scrollToRow(at: indexPath as IndexPath, at: .top, animated: true)
     }
     
 }
